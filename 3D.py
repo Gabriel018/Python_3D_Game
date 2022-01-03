@@ -1,6 +1,7 @@
 from self import self
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
+from random import  uniform
 
 app = Ursina()
 
@@ -33,10 +34,13 @@ wall14 = duplicate(wall3,x=50)
 
 
 
-enemy = Entity(model='quad', position=(5, 3, 5),
-                   texture="img/monster.png",
-                   collider='box',
-                   scale=5)
+enemy = Entity(model='cube', position=( uniform(10, 50),5, uniform(0,45)),
+                           texture="img/monster.png",
+                           collider='box',
+                           scale=5)
+
+
+enemy.visible = True
 
 gun_flah = Entity(model='quad',
                              texture='img/gun_animat',
@@ -47,19 +51,26 @@ gun_flah = Entity(model='quad',
 invoke(setattr,gun_flah, 'visible', False, delay=.4)
 gun_flah.visible = False
 
+def Respaw():
+    enemy.visible = True
+
 
 def input(key):
 
         if key == 'left mouse down':
             Audio('sound/shot.wav')
             if enemy.hovered:
-                destroy(enemy)
+               enemy.visible = False
+               invoke(Respaw,delay=2)
             gun.position=(.0, -.28)
             gun_flah.visible = True
         else:
             gun_flah.visible = False
             gun.position = (.0, -.3)
 
+def update():
+    enemy.look_at(player)
+    enemy.position += enemy.forward * time.dt * 0.5
 
 
 app.run()
